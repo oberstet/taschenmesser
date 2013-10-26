@@ -19,6 +19,7 @@
 import gclosure
 import aws
 import fileutil
+import svg
 
 
 def generate(env):
@@ -30,6 +31,9 @@ def generate(env):
 
    if fileutil.exists(env):
       fileutil.generate(env)
+
+   if svg.exists(env):
+      svg.generate(env)
 
 
 def exists(env):

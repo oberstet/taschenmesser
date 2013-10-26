@@ -19,12 +19,20 @@
 from setuptools import setup, find_packages
 
 LONGSDESC = """
+Taschenmesser is a toolbelt containing builders for SCons. It helps you getting stuff done.
+
+It contains builders for:
+
+  - SVG optimization (Scour-based)
+  - Amazon Web Service (S3 Delta Uploads etc)
+  - Google Closure (JavaScript optimization)
+  - File utils (GZip etc)
 """
 
 setup (
    name = 'taschenmesser',
    version = '0.0.1',
-   description = 'Taschenmesser',
+   description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',
    author = 'Tavendo GmbH',
@@ -32,6 +40,10 @@ setup (
    url = 'http://www.tavendo.de',
    platforms = ('Any'),
    install_requires = ['setuptools'],
+   extras_require = {
+      'aws': ["boto"],
+      'svg': ["scour>=0.27"]
+   },
    packages = find_packages(),
    include_package_data = True,
    zip_safe = False,
@@ -53,5 +65,5 @@ setup (
                   "Topic :: Software Development :: Testing",
                   "Topic :: System :: Systems Administration",
                   "Topic :: Utilities"],
-   keywords = ''
+   keywords = 'scons svg s3 aws'
 )
