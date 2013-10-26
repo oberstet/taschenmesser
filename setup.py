@@ -24,14 +24,19 @@ Taschenmesser is a toolbelt containing builders for SCons. It helps you getting 
 It contains builders for:
 
   - SVG optimization (Scour-based)
+  - SVG2PNG conversion (Inkscape-based)
   - Amazon Web Service (S3 Delta Uploads etc)
   - Google Closure (JavaScript optimization)
   - File utils (GZip etc)
+
+License: Apache 2.0
+
+Fork me on GitHub: https://github.com/oberstet/taschenmesser
 """
 
 setup (
    name = 'taschenmesser',
-   version = '0.0.2',
+   version = '0.0.3',
    description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',
@@ -45,7 +50,7 @@ setup (
       'svg': ["scour>=0.27"]
    },
    packages = find_packages(),
-   include_package_data = True,
+   #include_package_data = True,
    zip_safe = False,
    entry_points = {},
    ## http://pypi.python.org/pypi?%3Aaction=list_classifiers
