@@ -32,7 +32,7 @@ For SVG optimization, you will need [Scour](https://github.com/oberstet/scour):
 
 ### Inkscape
 
-For SVG-to-PNG conversion, you will need [Inkscape](http://inkscape.org/).
+For SVG-to-PNG conversion, you will need [Inkscape](http://inkscape.org/). Make sure the Inkscape executable is on your `PATH`.
 
 ### Boto
 
@@ -75,11 +75,11 @@ To cleanup, do:
 
 Here is a more complete example `SConstruct` that show how to produce:
 
-   * Optimized SVGs
-   * PNGs from those
-   * GZipped versions of all
+ * Optimized SVGs
+ * PNGs from those
+ * GZipped versions of all
 
-everything produced via a single command (`scons`):
+everything produced via a single command.
 
 	SVG_FILES = ['myfigure.svg', 'awesome_shit1.svg', 'awesome_shit2.svg']
 	
