@@ -31,7 +31,7 @@ It contains builders for:
 
 setup (
    name = 'taschenmesser',
-   version = '0.0.1',
+   version = '0.0.2',
    description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',

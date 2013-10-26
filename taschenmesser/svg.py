@@ -20,6 +20,8 @@ __all__ = ['exists', 'generate']
 
 
 def exists(env):
+   if not env.Detect("inkscape"):
+      print "Taschenmesser: Inkscape executable not found - SVG to PNG conversion won't be available."
    try:
       import scour
       return True
@@ -31,7 +33,10 @@ def exists(env):
 
 def generate(env):
    from SCons.Builder import Builder
+
    import scour
+   import os, subprocess
+
 
    def Scour(target, source, env):
       if len(source) > 1:
@@ -63,5 +68,34 @@ def generate(env):
 
       scour.scour.start(options, instream, outstream)
 
-
    env.Append(BUILDERS = {'Scour': Builder(action = Scour)})
+
+
+   def Svg2Png(target, source, env):
+      inkscape = env.Detect("inkscape")
+
+      infile = str(source[0])
+      outfile = str(target[0])
+
+      cmd = []
+      cmd.append(inkscape)
+      cmd.extend(['-z', '-e', outfile])
+
+      if env.has_key('SVG2PNG_OPTIONS'):
+
+         if env['SVG2PNG_OPTIONS'].has_key('width'):
+            width = int(env['SVG2PNG_OPTIONS']['width'])
+            cmd.extend(['-w', '%d' % width])
+
+         if env['SVG2PNG_OPTIONS'].has_key('height'):
+            height = int(env['SVG2PNG_OPTIONS']['height'])
+            cmd.extend(['-h', '%d' % height])
+
+      cmd.extend([infile])
+
+      # "C:\Program Files (x86)\Inkscape\inkscape.exe" -z -e crossbar_hiw_architecture.png -w 1024 crossbar_hiw_architecture.svg
+
+      print ' '.join(cmd)
+      subprocess.call(cmd)
+
+   env.Append(BUILDERS = {'Svg2Png': Builder(action = Svg2Png)})
