@@ -36,7 +36,7 @@ Fork me on GitHub: https://github.com/oberstet/taschenmesser
 
 setup (
    name = 'taschenmesser',
-   version = '0.0.3',
+   version = '0.0.4',
    description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',

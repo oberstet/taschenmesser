@@ -37,7 +37,8 @@ def generate(env):
       if len(source) > 1:
          raise Exception("cannot GZip multiple files")
       f_in = open(source[0].path, 'rb')
-      f_out = gzip.open(target[0].path, 'wb')
+      #f_out = gzip.open(target[0].path, 'wb')
+      f_out = gzip.GzipFile(target[0].path, 'wb', mtime = 0)
       f_out.writelines(f_in)
       f_out.close()
       f_in.close()
