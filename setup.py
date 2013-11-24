@@ -27,7 +27,7 @@ It contains builders for:
   - SVG2PNG conversion (Inkscape-based)
   - Amazon Web Service (S3 Delta Uploads etc)
   - Google Closure (JavaScript optimization)
-  - File utils (GZip etc)
+  - File utils (GZip, MD5, SHA1, SHA256, etc)
 
 License: Apache 2.0
 
@@ -36,7 +36,7 @@ Fork me on GitHub: https://github.com/oberstet/taschenmesser
 
 setup (
    name = 'taschenmesser',
-   version = '0.0.4',
+   version = '0.0.5',
    description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',
