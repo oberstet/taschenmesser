@@ -16,29 +16,27 @@
 ##
 ###############################################################################
 
-import gclosure
-import aws
-import fileutil
-import svg
-import pyegg
-
-
-def generate(env):
-   if aws.exists(env):
-      aws.generate(env)
-
-   if gclosure.exists(env):
-      gclosure.generate(env)
-
-   if fileutil.exists(env):
-      fileutil.generate(env)
-
-   if svg.exists(env):
-      svg.generate(env)
-
-   if pyegg.exists(env):
-      pyegg.generate(env)
+__all__ = ['exists', 'generate']
 
 
 def exists(env):
-   return True
+   try:
+      import setuptools
+      return True
+   except:
+      print "Taschenmesser: Setuptools missing. Python Egg creation won't be available."
+      return False
+
+
+
+def generate(env):
+   from SCons.Builder import Builder
+
+   #import setuptools
+   #from setuptools import setup
+   from setuptools.sandbox import run_setup
+
+   def python_egg_builder(target, source, env):
+      run_setup(source[0].path, ["bdist_egg"])
+
+   env.Append(BUILDERS = {'Egg': Builder(action = python_egg_builder)})
