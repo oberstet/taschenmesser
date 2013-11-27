@@ -87,13 +87,15 @@ def generate(env):
          print "Uploading %s to S3 .." % u.name
          key = Key(bucket, "%s%s" % (s3_bucket_prefix if s3_bucket_prefix else '', u.name))
 
-         ## Do special stuff for "*.jgz". Note that "set_metadata"
+         ## Do special stuff for "*.jgz", etc. Note that "set_metadata"
          ## must be set before uploading!
          ##
-         if os.path.splitext(u.name)[1].lower() == ".jgz":
-            ## override defaults chosen by AWS S3 ..
+         ext = os.path.splitext(u.name)[1].lower()
+         if ext == '.jgz':
             key.set_metadata('Content-Type', 'application/x-javascript')
             key.set_metadata('Content-Encoding', 'gzip')
+         elif ext == '.atom':
+            key.set_metadata('Content-Type', 'application/atom+xml')
 
          key.set_contents_from_filename(u.path, cb = s3_upload_percent_cb, num_cb = 100)
          key.set_acl(s3_object_acl)
