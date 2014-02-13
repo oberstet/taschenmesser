@@ -32,11 +32,36 @@ def exists(env):
 def generate(env):
    from SCons.Builder import Builder
 
+   def python_version_extract(target, source, env):
+      ## See: http://stackoverflow.com/a/7071358/884770
+      ##
+      import re, os
+      VERSIONFILE = source[0].path
+      if os.path.isfile(VERSIONFILE):
+         verstrline = open(VERSIONFILE, "rt").read()
+         VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
+         mo = re.search(VSRE, verstrline, re.M)
+         if mo:
+            verstr = mo.group(1).strip()
+            fd = open(target[0].path, 'w')
+            fd.write(verstr)
+            fd.close()
+         else:
+            #raise SCons.Errors.UserError, "sdfs"
+            raise Exception("Unable to find version string in %s." % (VERSIONFILE,))
+      else:
+         raise Exception("%s does not seem to be a file" % VERSIONFILE)
+
+   env.Append(BUILDERS = {'PyVersionExtract': Builder(action = python_version_extract)})
+
+
    #import setuptools
    #from setuptools import setup
    from setuptools.sandbox import run_setup
 
-   def python_egg_builder(target, source, env):
-      run_setup(source[0].path, ["bdist_egg"])
+   def python_package_builder(target, source, env):
+      res = run_setup(source[0].path, ["sdist", "bdist_egg", "bdist_wininst"])
 
-   env.Append(BUILDERS = {'Egg': Builder(action = python_egg_builder)})
+   env.Append(BUILDERS = {'PyPackage': Builder(action = python_package_builder)})
+
+

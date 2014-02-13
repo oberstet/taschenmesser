@@ -46,7 +46,9 @@ def generate(env):
       """
       SCons builder for Google Closure.
       """
-      if env['JS_COMPILATION_LEVEL'] == 'NONE':
+      clevel = env.get('JS_COMPILATION_LEVEL', None)
+
+      if clevel == 'NONE':
          outfile = str(target[0])
          of = open(outfile, 'w')
          for file in source:
@@ -60,8 +62,12 @@ def generate(env):
 
          cmd.extend(['-jar', env['JS_COMPILER']])
 
-         for define in env['JS_DEFINES']:
-            cmd.append('--define="%s=%s"' % (define, env['JS_DEFINES'][define]))
+         if clevel in ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 'ADVANCED_OPTIMIZATIONS']:
+            cmd.extend(['--compilation_level', clevel])
+
+         if env.get('JS_DEFINES'):
+            for define in env['JS_DEFINES']:
+               cmd.append('--define="%s=%s"' % (define, env['JS_DEFINES'][define]))
 
          for file in source:
             cmd.extend(["--js", str(file)])
