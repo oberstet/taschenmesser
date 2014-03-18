@@ -1,6 +1,6 @@
 ###############################################################################
 ##
-##  Copyright 2013 (C) Tavendo GmbH
+##  Copyright (C) 2013-2014 Tavendo GmbH
 ##
 ##  Licensed under the Apache License, Version 2.0 (the "License");
 ##  you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ Fork me on GitHub: https://github.com/oberstet/taschenmesser
 
 setup (
    name = 'taschenmesser',
-   version = '0.0.6',
+   version = '0.1.0',
    description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',
@@ -56,7 +56,7 @@ setup (
    ## http://pypi.python.org/pypi?%3Aaction=list_classifiers
    ##
    classifiers = ["License :: OSI Approved :: Apache Software License",
-                  "Development Status :: 3 - Alpha",
+                  "Development Status :: 4 - Beta",
                   "Environment :: Console",
                   "Framework :: Twisted",
                   "Intended Audience :: Developers",

@@ -35,7 +35,7 @@ def exists(env):
 def generate(env):
    from SCons.Builder import Builder
 
-   import os, sys, hashlib, gzip
+   import os, sys, hashlib, gzip, posixpath
    import subprocess
 
    from boto.s3.connection import S3Connection
@@ -55,8 +55,21 @@ def generate(env):
       ## the bucket, bucket prefix and object ACLs come from env
       ##
       s3_bucket_name = env['S3_BUCKET']
-      s3_bucket_prefix = env.get('S3_BUCKET_PREFIX', None)
       s3_object_acl = env.get('S3_OBJECT_ACL', 'public-read')
+
+      s3_bucket_prefix = env.get('S3_BUCKET_PREFIX', '')
+      s3_relpath = env.get('S3_RELPATH', None)
+
+
+      def rpath(o):
+         """
+         Convert scons source file object to remote S3 URL path.
+         """
+         if s3_relpath:
+            return (s3_bucket_prefix + os.path.relpath(o.path, s3_relpath)).replace('\\', '/')
+         else:
+            return (s3_bucket_prefix + o.name).replace('\\', '/')
+
 
       ## S3 connection and bucket to upload to
       ##
@@ -67,16 +80,16 @@ def generate(env):
       ##
       checksums = {}
       for s in source:
-         key = Key(s.name)
+         key = Key(s.path)
          md5 = key.compute_md5(open(s.path, "rb"))[0]
-         checksums[s.name] = md5
+         checksums[s.path] = md5
 
       ## determine stuff we need to upload
       ##
       uploads = []
       for s in source:
-         key = bucket.lookup("%s%s" % (s3_bucket_prefix if s3_bucket_prefix else '', s.name))
-         if not key or key.etag.replace('"', '') != checksums[s.name]:
+         key = bucket.lookup(rpath(s))
+         if not key or key.etag.replace('"', '') != checksums[s.path]:
             uploads.append(s)
          else:
             print "%s unchanged versus S3" % s.name
@@ -84,8 +97,8 @@ def generate(env):
       ## actually upload new or changed stuff
       ##
       for u in uploads:
-         print "Uploading %s to S3 .." % u.name
-         key = Key(bucket, "%s%s" % (s3_bucket_prefix if s3_bucket_prefix else '', u.name))
+         print "Uploading '%s' to S3 at '%s' .." % (u.path, rpath(u))
+         key = Key(bucket, rpath(u))
 
          ## Do special stuff for "*.jgz", etc. Note that "set_metadata"
          ## must be set before uploading!
@@ -104,7 +117,7 @@ def generate(env):
       ##
       checksumsS3 = {}
       for s in source:
-         key = bucket.lookup("%s%s" % (s3_bucket_prefix if s3_bucket_prefix else '', s.name))
+         key = bucket.lookup(rpath(s))
          md5 = key.etag.replace('"', '')
          checksumsS3[s.name] = md5
       checksumsS3String = ''.join(["MD5 (%s) = %s\n" % c for c in checksumsS3.items()])
