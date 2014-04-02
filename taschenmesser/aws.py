@@ -60,7 +60,6 @@ def generate(env):
       s3_bucket_prefix = env.get('S3_BUCKET_PREFIX', '')
       s3_relpath = env.get('S3_RELPATH', None)
 
-
       def rpath(o):
          """
          Convert scons source file object to remote S3 URL path.
@@ -92,7 +91,7 @@ def generate(env):
          if not key or key.etag.replace('"', '') != checksums[s.path]:
             uploads.append(s)
          else:
-            print "%s unchanged versus S3" % s.name
+            print "'%s' unchanged versus S3" % rpath(s)
 
       ## actually upload new or changed stuff
       ##
@@ -206,16 +205,16 @@ def generate(env):
 
       uploaded = []
 
-      env['S3_RELPATH'] = localdir
-      env['S3_BUCKET'] = bucket
-      env['S3_BUCKET_PREFIX'] = prefix
-      env['S3_OBJECT_ACL'] = 'public-read'
-
       for root, dirnames, filenames in os.walk(localdir):
          for filename in filenames:
             source = os.path.join(root, filename)
             target = os.path.join(buildir, source)
-            uploaded.append(env.S3('{}.s3'.format(target), source))
+            uploaded.append(env.S3('{}.s3'.format(target),
+                            source,
+                            S3_RELPATH = localdir,
+                            S3_BUCKET = bucket,
+                            S3_BUCKET_PREFIX = prefix,
+                            S3_OBJECT_ACL = 'public-read'))
 
       return uploaded
 
