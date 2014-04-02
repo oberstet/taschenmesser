@@ -188,7 +188,41 @@ def generate(env):
       f.close()
 
 
+   def s3_dir_uploader(buildir, localdir, bucket, prefix):
+      """
+      Uploads a whole directory tree to S3.
+
+      :param builddir: Directory where to put file upload checksum files.
+      :type builddir: str
+      :param localdir: The local directory to upload from.
+      :type localdir: str
+      :param bucket: The Amazon S3 bucket to upload to.
+      :type bucket: str
+      :param prefix: The prefix within the S3 bucket to upload to (must end with a slash!)
+      :type prefix: str
+      """
+      if prefix and prefix[-1] != '/':
+            prefix += '/'
+
+      uploaded = []
+
+      env['S3_RELPATH'] = localdir
+      env['S3_BUCKET'] = bucket
+      env['S3_BUCKET_PREFIX'] = prefix
+      env['S3_OBJECT_ACL'] = 'public-read'
+
+      for root, dirnames, filenames in os.walk(localdir):
+         for filename in filenames:
+            source = os.path.join(root, filename)
+            target = os.path.join(buildir, source)
+            uploaded.append(env.S3('{}.s3'.format(target), source))
+
+      return uploaded
+
+
    env.Append(BUILDERS = {'S3': Builder(action = s3_uploader),
                           'MD5': Builder(action = checksumsMD5),
                           'SHA1': Builder(action = checksumsSHA1),
                           'SHA256': Builder(action = checksumsSHA256)})
+
+   env.s3_dir_uploader = s3_dir_uploader
