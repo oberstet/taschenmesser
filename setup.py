@@ -36,7 +36,7 @@ Fork me on GitHub: https://github.com/oberstet/taschenmesser
 
 setup (
    name = 'taschenmesser',
-   version = '0.1.2',
+   version = '0.1.3',
    description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',
@@ -47,7 +47,7 @@ setup (
    install_requires = ['setuptools'],
    extras_require = {
       'aws': ["boto"],
-      'svg': ["scour>=0.27"]
+      'svg': ["scour>=0.29"]
    },
    packages = find_packages(),
    #include_package_data = True,

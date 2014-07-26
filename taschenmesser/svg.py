@@ -35,7 +35,7 @@ def generate(env):
    from SCons.Builder import Builder
 
    import scour
-   import os, subprocess
+   import os, sys, subprocess
 
 
    def Scour(target, source, env):
@@ -99,3 +99,30 @@ def generate(env):
       subprocess.call(cmd)
 
    env.Append(BUILDERS = {'Svg2Png': Builder(action = Svg2Png)})
+
+
+   def process_svg(svg_files, source_dir, gen_dir):
+      """
+      Process a set of SVG files.
+
+      :param svg_files: List of SVG (base) file names, e.g. ``["fig1.svg", "fig2.svg"]``.
+      :type svg_files: list
+      :param source_dir: The local directory contained source files, e.g. ``"./design/figures"``.
+      :type source_dir: str
+      :param gen_dir: The directory where to place generated files, e.g. ``_static/img/gen"``.
+      :type gen_dir: str
+      """
+      imgs = []
+      for svg in svg_files:
+         svgOpt = env.Scour("%s/%s" % (gen_dir, svg),
+                            "%s/%s" % (source_dir, svg),
+                            SCOUR_OPTIONS = {'enable_viewboxing': True})
+         imgs.append(svgOpt)
+         imgs.append(env.GZip("%s.gz" % svgOpt[0], svgOpt))
+         png = env.Svg2Png("%s.png" % os.path.splitext(str(svgOpt[0]))[0], svgOpt, SVG2PNG_OPTIONS = {})
+         imgs.append(png)
+         imgs.append(env.GZip("%s.gz" % png[0], png))
+
+      return imgs
+
+   env.process_svg = process_svg
