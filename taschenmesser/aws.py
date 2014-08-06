@@ -21,6 +21,14 @@ __all__ = ['exists', 'generate']
 
 import hashlib
 
+import mimetypes
+mimetypes.add_type('application/atom+xml', '.atom')
+
+import email
+import time
+from datetime import datetime, timedelta
+
+
 
 def exists(env):
    try:
@@ -56,6 +64,7 @@ def generate(env):
       ##
       s3_bucket_name = env['S3_BUCKET']
       s3_object_acl = env.get('S3_OBJECT_ACL', 'public-read')
+      s3_maxages = env.get('S3_MAXAGES', None) or {}
 
       s3_bucket_prefix = env.get('S3_BUCKET_PREFIX', '')
       s3_relpath = env.get('S3_RELPATH', None)
@@ -99,15 +108,30 @@ def generate(env):
          print "Uploading '%s' to S3 at '%s' .." % (u.path, rpath(u))
          key = Key(bucket, rpath(u))
 
-         ## Do special stuff for "*.jgz", etc. Note that "set_metadata"
-         ## must be set before uploading!
+         file_ext = os.path.splitext(u.name)[1].lower()
+         content_type, content_encoding = mimetypes.guess_type(u.name)
+
+         ## Note that "set_metadata" must be set before uploading!
          ##
-         ext = os.path.splitext(u.name)[1].lower()
-         if ext == '.jgz':
-            key.set_metadata('Content-Type', 'application/x-javascript')
-            key.set_metadata('Content-Encoding', 'gzip')
-         elif ext == '.atom':
-            key.set_metadata('Content-Type', 'application/atom+xml')
+         if content_type:
+            key.set_metadata('Content-Type', content_type)
+         if content_encoding:
+            key.set_metadata('Content-Encoding', content_encoding)
+
+         def set_maxage(key, days):
+            ## HTTP 1.0
+            expires = '%s GMT' % (email.Utils.formatdate(time.mktime((datetime.now() + timedelta(days = days)).timetuple())))
+            key.set_metadata('Expires', expires)
+
+            ## HTTP 1.1
+            max_age = 'max-age=%d, public' % (3600 * 24 * days)
+            key.set_metadata('Cache-Control', max_age)
+
+         if file_ext in s3_maxages:
+            set_maxage(key, s3_maxages[file_ext])
+
+         if content_type in s3_maxages:
+            set_maxage(key, s3_maxages[content_type])
 
          key.set_contents_from_filename(u.path, cb = s3_upload_percent_cb, num_cb = 100)
          key.set_acl(s3_object_acl)
@@ -187,7 +211,7 @@ def generate(env):
       f.close()
 
 
-   def s3_dir_uploader(buildir, localdir, bucket, prefix):
+   def s3_dir_uploader(buildir, localdir, bucket, prefix, maxages = None):
       """
       Uploads a whole directory tree to S3.
 
@@ -214,7 +238,8 @@ def generate(env):
                             S3_RELPATH = localdir,
                             S3_BUCKET = bucket,
                             S3_BUCKET_PREFIX = prefix,
-                            S3_OBJECT_ACL = 'public-read'))
+                            S3_OBJECT_ACL = 'public-read',
+                            S3_MAXAGES = maxages))
 
       return uploaded
 
