@@ -57,6 +57,22 @@ def generate(env):
 
    import subprocess
 
+   def get_git_latest_commit(gitdir = None):
+      """
+      Get git info line on latest commit.
+
+      E.g.: Jay Martin (Wed Aug 13 07:46:39 2014 -0700): Updated Router Realms (markdown)
+
+      Usage: env['COMMIT'] = env.GetLatestCommit()
+      """
+      gitdir = gitdir or '.git'
+      cmd = 'git --git-dir="{}" log -1 --pretty=format:"%an (%ad): %s"'.format(gitdir)
+      output = subprocess.check_output(cmd, shell = True).strip()
+      return output
+
+   env.GetLatestCommit = get_git_latest_commit
+
+
    def get_git_revision():
       """
       Get git revision stamp of HEAD.
