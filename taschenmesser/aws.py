@@ -23,6 +23,13 @@ import hashlib
 
 import mimetypes
 mimetypes.add_type('application/atom+xml', '.atom')
+mimetypes.add_type('text/javascript', '.jgz')
+mimetypes.add_type('image/svg+xml', '.svg')
+
+## any additional file extensions that signal Gzip encoding when not
+## explicitly found via Python's mimetypes module
+##
+GZIP_ENCODING_FILE_EXTS = ['.gz', '.jgz']
 
 import email
 import time
@@ -117,6 +124,8 @@ def generate(env):
             key.set_metadata('Content-Type', content_type)
          if content_encoding:
             key.set_metadata('Content-Encoding', content_encoding)
+         elif file_ext in GZIP_ENCODING_FILE_EXTS:
+            key.set_metadata('Content-Encoding', 'gzip')
 
          def set_maxage(key, days):
             ## HTTP 1.0
