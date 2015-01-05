@@ -18,6 +18,27 @@
 
 __all__ = ['exists', 'generate']
 
+# The following monkey patch is for buckets containing periods
+# and due to the following
+# https://github.com/boto/boto/issues/2836
+
+# disable hostname verification altogether
+# import ssl
+# if hasattr(ssl, '_create_unverified_context'):
+#    ssl._create_default_https_context = ssl._create_unverified_context
+
+# more specific monkey patch:
+import ssl
+_old_match_hostname = ssl.match_hostname
+
+def _new_match_hostname(cert, hostname):
+   if hostname.endswith('.s3.amazonaws.com'):
+      pos = hostname.find('.s3.amazonaws.com')
+      hostname = hostname[:pos].replace('.', '') + hostname[pos:]
+   return _old_match_hostname(cert, hostname)
+
+ssl.match_hostname = _new_match_hostname
+
 
 import hashlib
 
