@@ -1,6 +1,6 @@
 ###############################################################################
 ##
-##  Copyright 2013 (C) Tavendo GmbH
+##  Copyright (C) 2013-2015 Tavendo GmbH
 ##
 ##  Licensed under the Apache License, Version 2.0 (the "License");
 ##  you may not use this file except in compliance with the License.
@@ -28,16 +28,21 @@ __all__ = ['exists', 'generate']
 #    ssl._create_default_https_context = ssl._create_unverified_context
 
 # more specific monkey patch:
-import ssl
-_old_match_hostname = ssl.match_hostname
+try:
+   import ssl
+except:
+   print("Taschenmesser: no SSL available - secure upload to S3 won't be available")
+else:
+   if hasattr(ssl, 'match_hostname'):
+      _old_match_hostname = ssl.match_hostname
 
-def _new_match_hostname(cert, hostname):
-   if hostname.endswith('.s3.amazonaws.com'):
-      pos = hostname.find('.s3.amazonaws.com')
-      hostname = hostname[:pos].replace('.', '') + hostname[pos:]
-   return _old_match_hostname(cert, hostname)
+      def _new_match_hostname(cert, hostname):
+         if hostname.endswith('.s3.amazonaws.com'):
+            pos = hostname.find('.s3.amazonaws.com')
+            hostname = hostname[:pos].replace('.', '') + hostname[pos:]
+         return _old_match_hostname(cert, hostname)
 
-ssl.match_hostname = _new_match_hostname
+      ssl.match_hostname = _new_match_hostname
 
 
 import hashlib
@@ -63,7 +68,7 @@ def exists(env):
       import boto
       return True
    except:
-      print "Taschenmesser: Boto library missing. Upload to Amazon S3 won't be available."
+      print("Taschenmesser: Boto library missing. Upload to Amazon S3 won't be available.")
       return False
 
 
@@ -128,12 +133,12 @@ def generate(env):
          if not key or key.etag.replace('"', '') != checksums[s.path]:
             uploads.append(s)
          else:
-            print "'%s' unchanged versus S3" % rpath(s)
+            print("{0} unchanged versus S3".format(rpath(s)))
 
       ## actually upload new or changed stuff
       ##
       for u in uploads:
-         print "Uploading '%s' to S3 at '%s' .." % (u.path, rpath(u))
+         print("Uploading '{0}' to S3 at '{1}' ..".format(u.path, rpath(u)))
          key = Key(bucket, rpath(u))
 
          file_ext = os.path.splitext(u.name)[1].lower()

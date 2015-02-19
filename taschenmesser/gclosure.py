@@ -1,6 +1,6 @@
 ###############################################################################
 ##
-##  Copyright 2013 (C) Tavendo GmbH
+##  Copyright (C) 2013-2015 Tavendo GmbH
 ##
 ##  Licensed under the Apache License, Version 2.0 (the "License");
 ##  you may not use this file except in compliance with the License.
@@ -25,13 +25,13 @@ def exists(env):
    if os.environ.has_key('JAVA_HOME'):
       env['JAVA_HOME'] = os.environ['JAVA_HOME']
    else:
-      print "Need to have a Java Run-time - please set JAVA_HOME ennvironment variable."
+      print("Taschenmesser: Google Closure Compiler won't be available (no JAVA_HOME set)")
       return False
 
    if os.environ.has_key('JS_COMPILER'):
       env['JS_COMPILER'] = os.environ['JS_COMPILER']
    else:
-      print "Need path to Google Closure Compiler JAR (compiler.jar) in JS_COMPILER environment variable."
+      print("Taschenmesser: Google Closure Compiler won't be available (JS_COMPILER environment variable must be set and point to full path of 'compiler.jar')")
       return False
 
    return True
