@@ -34,9 +34,12 @@ License: Apache 2.0
 Fork me on GitHub: https://github.com/oberstet/taschenmesser
 """
 
+with open('taschenmesser/_version.py') as f:
+    exec(f.read())  # defines __version__
+
 setup (
    name = 'taschenmesser',
-   version = '0.1.7',
+   version = __version__,
    description = 'Taschenmesser, a toolbelt with plugins for SCons',
    long_description = LONGSDESC,
    license = 'Apache License 2.0',

@@ -21,6 +21,9 @@ import aws
 import fileutil
 import svg
 import pyegg
+from _version import __version__
+
+version = __version__
 
 
 def generate(env):

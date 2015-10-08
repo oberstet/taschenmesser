@@ -18,6 +18,9 @@
 
 __all__ = ['exists', 'generate']
 
+import re
+import os
+
 # The following monkey patch is for buckets containing periods
 # and due to the following
 # https://github.com/boto/boto/issues/2836
@@ -36,14 +39,25 @@ else:
    if hasattr(ssl, 'match_hostname'):
       _old_match_hostname = ssl.match_hostname
 
+      # crossbario.com.s3.amazonaws.com => s3.amazonaws.com
+      pattern1 = re.compile(r'^(.*).s3.amazonaws.com$')
+
+      # crossbario.com.s3.eu-central-1.amazonaws.com => s3.eu-central-1.amazonaws.com
+      pattern2 = re.compile(r'^(.*).s3.(.*).amazonaws.com$')
+
       def _new_match_hostname(cert, hostname):
-         if hostname.endswith('.s3.amazonaws.com'):
-            pos = hostname.find('.s3.amazonaws.com')
-            hostname = hostname[:pos].replace('.', '') + hostname[pos:]
+         match1 = pattern1.match(hostname)
+         if match1:
+            hostname = 's3.amazonaws.com'
+         else:
+            match2 = pattern2.match(hostname)
+            if match2:
+               _, region = match2.groups()
+               hostname = 's3.{}.amazonaws.com'.format(region)
+
          return _old_match_hostname(cert, hostname)
 
       ssl.match_hostname = _new_match_hostname
-
 
 import hashlib
 
@@ -60,7 +74,6 @@ GZIP_ENCODING_FILE_EXTS = ['.gz', '.jgz']
 import email
 import time
 from datetime import datetime, timedelta
-
 
 
 def exists(env):
@@ -114,8 +127,21 @@ def generate(env):
 
       ## S3 connection and bucket to upload to
       ##
-      s3 = S3Connection()
-      bucket = s3.get_bucket(s3_bucket_name)
+      s3 = None
+      bucket = None
+      try:
+         s3 = S3Connection()
+         bucket = s3.get_bucket(s3_bucket_name)
+      except:
+         # this an ugly, half-baked patch to make FFM region work
+         # (as well as possibly other regions)
+         # http://stackoverflow.com/a/29391782/884770
+         # https://github.com/boto/boto/issues/2916
+         # https://github.com/danilop/yas3fs/issues/101
+         # https://github.com/boto/boto/issues/2741
+         os.environ['S3_USE_SIGV4'] = 'True'
+         s3 = S3Connection(host='s3.eu-central-1.amazonaws.com')
+         bucket = s3.get_bucket(s3_bucket_name)
 
       ## compute MD5s of artifacts to upload
       ##
