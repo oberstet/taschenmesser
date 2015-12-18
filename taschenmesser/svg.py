@@ -34,7 +34,7 @@ def exists(env):
 def generate(env):
    from SCons.Builder import Builder
 
-   import scour
+   from scour import scour
    import os, sys, subprocess
 
 
@@ -42,7 +42,7 @@ def generate(env):
       if len(source) > 1:
          raise Exception("cannot SVG multiple files")
 
-      options = scour.scour.generateDefaultOptions()
+      options = scour.generateDefaultOptions()
 
       ## override defaults for max cleansing
       ##
@@ -66,7 +66,7 @@ def generate(env):
       instream = open(source[0].path, 'rb')
       outstream = open(target[0].path, 'wb')
 
-      scour.scour.start(options, instream, outstream)
+      scour.start(options, instream, outstream)
 
    env.Append(BUILDERS = {'Scour': Builder(action = Scour)})
 
