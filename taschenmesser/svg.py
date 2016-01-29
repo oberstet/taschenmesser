@@ -56,12 +56,13 @@ def generate(env):
       if env.has_key('SCOUR_OPTIONS'):
          options.__dict__.update(env['SCOUR_OPTIONS'])
 
-      from pprint import pprint
-      print
-      print "Using Scour options:"
-      print
-      print pprint(options.__dict__)
-      print
+      if False:
+         from pprint import pprint
+         print
+         print "Using Scour options:"
+         print
+         print pprint(options.__dict__)
+         print
 
       instream = open(source[0].path, 'rb')
       outstream = open(target[0].path, 'wb')

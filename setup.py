@@ -50,7 +50,7 @@ setup (
    install_requires = ['setuptools'],
    extras_require = {
       'aws': ["boto"],
-      'svg': ["scour==0.32"]
+      'svg': ["scour==0.33"]
    },
    packages = find_packages(),
    #include_package_data = True,
