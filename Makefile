@@ -16,9 +16,8 @@ clean:
 	rm -rf ./dist
 	find . -name "*.pyc" -exec rm -f {} \;
 
-build: clean
-	python setup.py bdist_egg
+build:
+	python setup.py sdist bdist_wheel
 
-publish: clean
-	python setup.py register
-	python setup.py sdist upload
+publish: clean build
+	twine upload dist/*
