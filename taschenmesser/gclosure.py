@@ -58,7 +58,8 @@ def generate(env):
 
       else:
          cmd = []
-         cmd.append(os.path.join(env['JAVA_HOME'], 'bin', 'java'))
+         #cmd.append(os.path.join(env['JAVA_HOME'], 'bin', 'java'))
+         cmd.append('java')
 
          cmd.extend(['-jar', env['JS_COMPILER']])
 

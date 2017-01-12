@@ -8,7 +8,7 @@ all:
 	@echo ""
 
 install:
-	python setup.py install
+	pip install --upgrade -e .
 
 clean:
 	rm -rf ./taschenmesser.egg-info
