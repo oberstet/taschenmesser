@@ -47,6 +47,7 @@ def generate(env):
       SCons builder for Google Closure.
       """
       clevel = env.get('JS_COMPILATION_LEVEL', None)
+      coutlang = env.get('JS_OUTPUT_LANG', None)
 
       if clevel == 'NONE':
          outfile = str(target[0])
@@ -65,6 +66,9 @@ def generate(env):
 
          if clevel in ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 'ADVANCED_OPTIMIZATIONS']:
             cmd.extend(['--compilation_level', clevel])
+
+         if coutlang in ['ES2015', 'ES5', 'ES5_STRICT', 'ES3']:
+            cmd.extend(['--language_out', coutlang])
 
          if env.get('JS_DEFINES'):
             for define in env['JS_DEFINES']:
