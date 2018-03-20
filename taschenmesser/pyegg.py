@@ -1,20 +1,22 @@
-###############################################################################
-##
-##  Copyright 2013 (C) Tavendo GmbH
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##      http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
-##
-###############################################################################
+##############################################################################
+#
+#  Copyright (c) Crossbar.io Technologies GmbH
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+##############################################################################
+
+from __future__ import absolute_import
 
 __all__ = ['exists', 'generate']
 
@@ -23,8 +25,8 @@ def exists(env):
    try:
       import setuptools
       return True
-   except:
-      print "Taschenmesser: Setuptools missing. Python Egg creation won't be available."
+   except ImportError:
+      print("Taschenmesser: Setuptools missing. Python Egg creation won't be available.")
       return False
 
 
@@ -60,8 +62,6 @@ def generate(env):
    from setuptools.sandbox import run_setup
 
    def python_package_builder(target, source, env):
-      res = run_setup(source[0].path, ["sdist", "bdist_egg", "bdist_wininst"])
+      run_setup(source[0].path, ["sdist", "bdist_egg", "bdist_wininst"])
 
    env.Append(BUILDERS = {'PyPackage': Builder(action = python_package_builder)})
-
-

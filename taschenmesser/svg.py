@@ -1,32 +1,34 @@
-###############################################################################
-##
-##  Copyright 2013 (C) Tavendo GmbH
-##
-##  Licensed under the Apache License, Version 2.0 (the "License");
-##  you may not use this file except in compliance with the License.
-##  You may obtain a copy of the License at
-##
-##      http://www.apache.org/licenses/LICENSE-2.0
-##
-##  Unless required by applicable law or agreed to in writing, software
-##  distributed under the License is distributed on an "AS IS" BASIS,
-##  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-##  See the License for the specific language governing permissions and
-##  limitations under the License.
-##
-###############################################################################
+##############################################################################
+#
+#  Copyright (c) Crossbar.io Technologies GmbH
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+##############################################################################
+
+from __future__ import absolute_import
 
 __all__ = ['exists', 'generate']
 
 
 def exists(env):
    if not env.Detect("inkscape"):
-      print "Taschenmesser: Inkscape executable not found - SVG to PNG conversion won't be available."
+      print("Taschenmesser: Inkscape executable not found - SVG to PNG conversion won't be available.")
    try:
       import scour
       return True
-   except:
-      print "Taschenmesser: scour missing"
+   except ImportError:
+      print("Taschenmesser: scour missing")
       return False
 
 
@@ -53,16 +55,13 @@ def generate(env):
       options.indent_type = None
       options.shorten_ids = True
 
-      if env.has_key('SCOUR_OPTIONS'):
+      if 'SCOUR_OPTIONS' in env:
          options.__dict__.update(env['SCOUR_OPTIONS'])
 
       if False:
          from pprint import pprint
-         print
-         print "Using Scour options:"
-         print
-         print pprint(options.__dict__)
-         print
+         print("\nUsing Scour options:\n")
+         pprint(options.__dict__)
 
       instream = open(source[0].path, 'rb')
       outstream = open(target[0].path, 'wb')
@@ -82,13 +81,13 @@ def generate(env):
       cmd.append(inkscape)
       cmd.extend(['-z', '-e', outfile])
 
-      if env.has_key('SVG2PNG_OPTIONS'):
+      if 'SVG2PNG_OPTIONS' in env:
 
-         if env['SVG2PNG_OPTIONS'].has_key('width'):
+         if 'width' in env['SVG2PNG_OPTIONS']:
             width = int(env['SVG2PNG_OPTIONS']['width'])
             cmd.extend(['-w', '%d' % width])
 
-         if env['SVG2PNG_OPTIONS'].has_key('height'):
+         if 'height' in env['SVG2PNG_OPTIONS']:
             height = int(env['SVG2PNG_OPTIONS']['height'])
             cmd.extend(['-h', '%d' % height])
 
@@ -96,7 +95,7 @@ def generate(env):
 
       # "C:\Program Files (x86)\Inkscape\inkscape.exe" -z -e crossbar_hiw_architecture.png -w 1024 crossbar_hiw_architecture.svg
 
-      print ' '.join(cmd)
+      print(' '.join(cmd))
       subprocess.call(cmd)
 
    env.Append(BUILDERS = {'Svg2Png': Builder(action = Svg2Png)})
