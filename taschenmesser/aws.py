@@ -211,7 +211,7 @@ def generate(env):
       ## target produced is checksums as they exist on S3
       ##
       f = open(target[0].path, "wb")
-      f.write(checksumsS3String)
+      f.write(checksumsS3String.encode('utf-8'))
       f.close()
 
 
