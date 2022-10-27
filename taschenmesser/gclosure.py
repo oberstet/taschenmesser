@@ -49,6 +49,7 @@ def generate(env):
       """
       clevel = env.get('JS_COMPILATION_LEVEL', None)
       coutlang = env.get('JS_OUTPUT_LANG', None)
+      strict = env.get("JS_STRICT_MODE", None)
 
       if clevel == 'NONE':
          outfile = str(target[0])
@@ -68,12 +69,24 @@ def generate(env):
          if clevel in ['WHITESPACE_ONLY', 'SIMPLE_OPTIMIZATIONS', 'ADVANCED_OPTIMIZATIONS']:
             cmd.extend(['--compilation_level', clevel])
 
-         if coutlang in ['ES2015', 'ES5', 'ES5_STRICT', 'ES3']:
+         # see https://github.com/google/closure-compiler/wiki/Flags-and-Options#basic-usage
+         out_levels = [
+            "ECMASCRIPT3", "ECMASCRIPT5", "ECMASCRIPT_2015", "ECMASCRIPT_2016", "ECMASCRIPT_2017",
+            "ECMASCRIPT_2018", "ECMASCRIPT_2019", "ECMASCRIPT_2020", "ECMASCRIPT_2021", "STABLE",
+            "ECMASCRIPT_NEXT"
+         ]
+
+         if coutlang in out_levels:
             cmd.extend(['--language_out', coutlang])
 
          if env.get('JS_DEFINES'):
             for define in env['JS_DEFINES']:
                cmd.append('--define="%s=%s"' % (define, env['JS_DEFINES'][define]))
+
+         # allow to disable strict mode to workaround issues like:
+         # https://github.com/google/closure-compiler/issues/3014
+         if strict is not None and strict in ["0", "1"]:
+            cmd.extend(['--strict_mode_input', "true" if strict == 1 else "false"])
 
          for file in source:
             cmd.extend(["--js", str(file)])
